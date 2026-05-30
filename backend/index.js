@@ -23,6 +23,7 @@ app.use('/api/checkins', require('./routes/dailyCheckinRoutes'));
 app.use('/api/gratitude', require('./routes/gratitudeRoutes'));
 app.use('/api/meditation', require('./routes/meditationRoutes'));
 app.use('/api/journey', require('./routes/journeyRoutes'));
+app.use('/api/tips', require('./routes/tipsRoutes'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
