@@ -24,6 +24,7 @@ app.use('/api/gratitude', require('./routes/gratitudeRoutes'));
 app.use('/api/meditation', require('./routes/meditationRoutes'));
 app.use('/api/journey', require('./routes/journeyRoutes'));
 app.use('/api/tips', require('./routes/tipsRoutes'));
+app.use('/api/recommendations', require('./routes/recommendationRoutes'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

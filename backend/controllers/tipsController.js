@@ -13,9 +13,10 @@ const generateTips = async (req, res) => {
     });
 
     const prompt = `Generate 3 unique, actionable daily tips and tricks for mental health and wellness. 
+One of the tips MUST be a daily affirmation.
 Each tip should have:
 - title: A short catchy title (max 5 words)
-- text: A brief description (max 2 sentences)
+- text: A brief description or affirmation phrase (max 2 sentences)
 - icon: A valid Ionicons icon name (e.g. 'leaf-outline', 'water-outline', 'sunny-outline', 'heart-outline', 'happy-outline', 'body-outline', 'fitness-outline', 'moon-outline', 'book-outline', 'cafe-outline')
 
 Return ONLY a valid JSON array of objects. Do not wrap in markdown tags like \`\`\`json.
