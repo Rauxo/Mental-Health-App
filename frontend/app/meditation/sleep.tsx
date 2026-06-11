@@ -70,7 +70,7 @@ export default function SleepScreen() {
   const startSession = async () => {
     try {
       const { sound: newSound } = await Audio.Sound.createAsync(
-         require('../../assets/music.mpeg'),
+         require('../../assets/sleepy-rain-116521.mp3'),
          { shouldPlay: true, isLooping: true }
       );
       setSound(newSound);

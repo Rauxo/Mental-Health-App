@@ -117,7 +117,7 @@ export default function BreathingScreen() {
     try {
       if (sound) await sound.unloadAsync();
       const { sound: newSound } = await Audio.Sound.createAsync(
-         require('../../assets/music.mpeg'),
+         require('../../assets/breathing.mp3'),
          { shouldPlay: true, isLooping: true }
       );
       setSound(newSound);
