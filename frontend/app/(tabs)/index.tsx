@@ -17,66 +17,62 @@ function getGreeting(): string {
   return 'Good Night';
 }
 
-const TIPS = [
-  { id: '1', title: '5-4-3-2-1 Grounding', text: 'Name 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, and 1 you can taste to stay present.', icon: 'leaf-outline' },
-  { id: '2', title: 'Daily Affirmation', text: 'I am worthy of peace, love, and joy. I allow myself to rest.', icon: 'heart-outline' },
-  { id: '3', title: 'Box Breathing', text: 'Inhale for 4s, hold for 4s, exhale for 4s, hold for 4s. Repeat 4 times to calm your nervous system.', icon: 'water-outline' },
+const AFFIRMATIONS = [
+  "I am calm and in control.",
+  "Today is a fresh start.",
+  "I choose peace over worry.",
+  "Every breath brings peace.",
+  "I am improving every day.",
+  "I am worthy of peace, love, and joy.",
+  "I allow myself to rest."
 ];
+
+const DAILY_TIPS = [
+  { id: '1', title: 'Wellness Tip', text: 'Drink a glass of water when you wake up to hydrate your brain.', icon: 'water-outline' },
+  { id: '2', title: 'Motivational Quote', text: '"The secret of getting ahead is getting started." - Mark Twain', icon: 'bulb-outline' },
+];
+
+function getRecommendation() {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 10) {
+    return { title: 'Morning Meditation', reason: 'Start your day with clarity and focus.', route: '/meditation/breathing?session=Morning Meditation' };
+  } else if (hour >= 10 && hour < 17) {
+    return { title: 'Focus Music', reason: 'Stay productive with an open-ended session.', route: '/meditation/focus' };
+  } else if (hour >= 17 && hour < 21) {
+    return { title: '5-4-3-2-1 Grounding', reason: 'Unwind from work and reset your stress levels.', route: '/meditation/grounding' };
+  } else {
+    return { title: 'Sleep Relax', reason: 'Prepare your mind and body for a deep sleep.', route: '/meditation/sleep' };
+  }
+}
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
-  const [tips, setTips] = useState(TIPS);
-  const [loadingTips, setLoadingTips] = useState(false);
+  const [dailyAffirmation, setDailyAffirmation] = useState(AFFIRMATIONS[0]);
+  const [tips, setTips] = useState(DAILY_TIPS);
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
   const firstName = user?.name?.split(' ')[0] || user?.username || user?.email?.split('@')[0] || '';
   const greeting = getGreeting();
-  const [recommendation, setRecommendation] = useState<string | null>(null);
-  const [loadingRecommendation, setLoadingRecommendation] = useState(false);
+  const [recommendation, setRecommendation] = useState<any>(getRecommendation());
 
-  const fetchTips = async () => {
-    setLoadingTips(true);
-    try {
-      const response = await apiClient.get('/tips');
-      if (response.data && response.data.length > 0) {
-        setTips(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch tips:', error);
-    } finally {
-      setLoadingTips(false);
-    }
-  };
-
-  const fetchRecommendation = async () => {
-    setLoadingRecommendation(true);
-    try {
-      const response = await apiClient.get('/recommendations');
-      if (response.data && response.data.recommendation) {
-        setRecommendation(response.data.recommendation);
-      }
-    } catch (error) {
-      console.error('Failed to fetch recommendation:', error);
-    } finally {
-      setLoadingRecommendation(false);
-    }
+  const refreshData = () => {
+    setDailyAffirmation(AFFIRMATIONS[Math.floor(Math.random() * AFFIRMATIONS.length)]);
+    setRecommendation(getRecommendation());
   };
 
   useEffect(() => {
-    fetchTips();
-    fetchRecommendation();
+    refreshData();
   }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([fetchTips(), fetchRecommendation()]);
-    setRefreshing(false);
+    refreshData();
+    setTimeout(() => setRefreshing(false), 800);
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#E0F2FE' }]} />
-      {/* Decorative circles */}
       <View style={[styles.decorCircle, styles.circle1]} />
       <View style={[styles.decorCircle, styles.circle2]} />
       <View style={[styles.decorCircle, styles.circle3]} />
@@ -92,12 +88,29 @@ export default function HomeScreen() {
 
         {recommendation && (
           <View style={styles.recommendationCard}>
-            <LinearGradient colors={['#FDF2F8', '#FCE7F3']} style={styles.recommendationGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+            <LinearGradient colors={['#F8FAFC', '#F1F5F9']} style={styles.recommendationGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
               <View style={styles.recommendationHeader}>
-                <MaterialCommunityIcons name="robot-outline" size={24} color="#EC4899" />
-                <Text style={styles.recommendationTitle}>AI Suggests</Text>
+                <MaterialCommunityIcons name="robot-outline" size={24} color="#0EA5E9" />
+                <Text style={styles.recommendationTitle}>AI Recommended For You</Text>
               </View>
-              <Text style={styles.recommendationText}>{recommendation}</Text>
+              
+              <View style={styles.recActivityRow}>
+                <View style={{flex: 1, paddingRight: 12}}>
+                  <Text style={styles.recActivityTitle}>{recommendation.title}</Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.recStartButton} 
+                  onPress={() => router.push(recommendation.route as any)}
+                >
+                  <Text style={styles.recStartText}>Start</Text>
+                  <Ionicons name="play" size={16} color="#fff" />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.recReasonBox}>
+                <Ionicons name="information-circle-outline" size={16} color="#0EA5E9" />
+                <Text style={styles.recReasonText}>{recommendation.reason}</Text>
+              </View>
             </LinearGradient>
           </View>
         )}
@@ -121,10 +134,19 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Daily Tips & Tricks</Text>
-          <TouchableOpacity onPress={fetchTips} disabled={loadingTips}>
-            <Ionicons name="refresh" size={24} color={loadingTips ? "#94a3b8" : "#4facfe"} />
+          <Text style={styles.sectionTitle}>Daily Affirmation</Text>
+          <TouchableOpacity onPress={refreshData}>
+            <Ionicons name="refresh" size={24} color="#4facfe" />
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.affirmationCard}>
+          <Ionicons name="heart" size={28} color="#F43F5E" style={styles.affirmationIcon} />
+          <Text style={styles.affirmationText}>"{dailyAffirmation}"</Text>
+        </View>
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Wellness & Growth</Text>
         </View>
 
         {tips.map((tip) => (
@@ -266,9 +288,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   recommendationCard: {
-    marginBottom: 24,
+    marginBottom: 32,
     borderRadius: 24,
-    shadowColor: '#EC4899',
+    shadowColor: '#0EA5E9',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 16,
@@ -279,23 +301,76 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: 'rgba(236, 72, 153, 0.2)',
+    borderColor: 'rgba(14, 165, 233, 0.2)',
   },
   recommendationHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 16,
   },
   recommendationTitle: {
-    color: '#BE185D',
+    color: '#0369A1',
     fontSize: 16,
     fontWeight: '700',
     marginLeft: 8,
   },
-  recommendationText: {
-    color: '#831843',
+  recActivityRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  recActivityTitle: {
+    color: '#1E293B',
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  recStartButton: {
+    backgroundColor: '#0EA5E9',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    gap: 6,
+  },
+  recStartText: {
+    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 15,
-    lineHeight: 22,
-    fontWeight: '500',
+  },
+  recReasonBox: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    padding: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    gap: 8,
+  },
+  recReasonText: {
+    color: '#0369A1',
+    fontSize: 14,
+    flex: 1,
+    lineHeight: 20,
+  },
+  affirmationCard: {
+    backgroundColor: '#FFF1F2',
+    padding: 24,
+    borderRadius: 24,
+    alignItems: 'center',
+    marginBottom: 32,
+    borderWidth: 1,
+    borderColor: '#FECDD3',
+  },
+  affirmationIcon: {
+    marginBottom: 12,
+  },
+  affirmationText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#BE123C',
+    textAlign: 'center',
+    lineHeight: 28,
+    fontStyle: 'italic',
   }
 });
